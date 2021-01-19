@@ -52,12 +52,13 @@ public class Init {
         visitados = new LinkedList<>();
         Ventana.panel.run();
         grafo.mostrarPuntero();
+        visitados.add(grafo.getApuntador().getPuntero());
         while (grafo.getApuntador().getPuntero().getNombre() != fin) {
             if (!grafo.getApuntador().getPuntero().getArcos().isEmpty()) {
                 for (Arco arco : grafo.getApuntador().getPuntero().getArcos()) {
                     if (!visitados.contains(arco.getNodo())) {
-                        visitados.add(arco.getNodo());
                         grafo.getApuntador().avanzarNodo(arco.getNodo());
+                        visitados.add(grafo.getApuntador().getPuntero());
                         break;
                     } else if (arco.equals(grafo.getApuntador().getPuntero().getArcos().getLast())) {
                         grafo.retrocederNodo();
