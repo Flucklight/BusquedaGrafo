@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="BusquedaGrafo:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/BusquedaGrafo_jar</output-path>
-    <root id="archive" name="BusquedaGrafo.jar">
-      <element id="module-output" name="BusquedaGrafo" />
-    </root>
-  </artifact>
-</component>
