@@ -85,8 +85,12 @@ public class Grafo {
         return inicial;
     }
 
-    public void setInicial(Nodo inicial) {
-        this.inicial = inicial;
+    public void setInicial(char inicial) {
+        for (Nodo n : this.nodos) {
+            if (n.getNombre() == inicial) {
+                this.inicial = n;
+            }
+        }
     }
 
     public LinkedList<Nodo> getNodos() {

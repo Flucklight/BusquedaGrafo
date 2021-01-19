@@ -42,4 +42,12 @@ public class Apuntador {
         return ruta;
     }
 
+    public Nodo getAntecesor() {
+        if (this.ruta.size() >= 2) {
+            return ruta.get(ruta.size() - 2);
+        } else {
+            return null;
+        }
+    }
+
 }
