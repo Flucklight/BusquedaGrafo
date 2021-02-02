@@ -10,16 +10,38 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 public class Init {
     public static Grafo grafo;
     public static LinkedList<Nodo> visitados;
-    public static char inicio = 'A';
-    public static char fin = 'R';
+    public static String inicio;
+    public static String fin;
+    public static boolean sentido;
     public static Integer[][] matriz;
+    private Scanner sc;
 
     public Init() throws IOException {
+        sc = new Scanner(System.in);
         grafo = new Grafo();
+        System.out.print("Inicio de la busqueda: ");
+        inicio = sc.nextLine();
+        System.out.print("Fin de la busqueda: ");
+        fin = sc.nextLine();
+        System.out.println("0 --> Horario");
+        System.out.println("1 --> Antihorario");
+        System.out.print("Sentido de la busqueda: ");
+        switch (sc.nextInt()) {
+            case 0:
+                sentido = false;
+                break;
+            case 1:
+                sentido = true;
+                break;
+            default :
+                sentido = false;
+                break;
+        }
         grafo.setInicial(inicio);
         visitados = new LinkedList<>();
         cargar();
@@ -52,15 +74,29 @@ public class Init {
         visitados = new LinkedList<>();
         Ventana.panel.run();
         grafo.mostrarPuntero();
-        while (grafo.getApuntador().getPuntero().getNombre() != fin) {
+        visitados.add(grafo.getApuntador().getPuntero());
+        while (Integer.parseInt(grafo.getApuntador().getPuntero().getNombre()) != Integer.parseInt(fin)) {
             if (!grafo.getApuntador().getPuntero().getArcos().isEmpty()) {
-                for (Arco arco : grafo.getApuntador().getPuntero().getArcos()) {
-                    if (!visitados.contains(arco.getNodo())) {
-                        visitados.add(arco.getNodo());
-                        grafo.getApuntador().avanzarNodo(arco.getNodo());
-                        break;
-                    } else if (arco.equals(grafo.getApuntador().getPuntero().getArcos().getLast())) {
-                        grafo.retrocederNodo();
+                if (sentido) {
+                    for (Arco arco : grafo.getApuntador().getPuntero().getArcos()) {
+                        if (!visitados.contains(arco.getNodo())) {
+                            visitados.add(arco.getNodo());
+                            grafo.getApuntador().avanzarNodo(arco.getNodo());
+                            break;
+                        } else if (arco.equals(grafo.getApuntador().getPuntero().getArcos().getLast())) {
+                            grafo.retrocederNodo();
+                        }
+                    }
+                } else {
+                    for (int i = grafo.getApuntador().getPuntero().getArcos().size() - 1; i >= 0; i--) {
+                        Arco arco = grafo.getApuntador().getPuntero().getArcos().get(i);
+                        if (!visitados.contains(arco.getNodo())) {
+                            visitados.add(arco.getNodo());
+                            grafo.getApuntador().avanzarNodo(arco.getNodo());
+                            break;
+                        } else if (arco.equals(grafo.getApuntador().getPuntero().getArcos().getLast())) {
+                            grafo.retrocederNodo();
+                        }
                     }
                 }
             } else {
@@ -79,7 +115,7 @@ public class Init {
         LinkedList<Nodo> visitar = new LinkedList<>();
         LinkedList<Nodo> tmp;
         visitar.add(grafo.getInicial());
-        while (grafo.getApuntador().getPuntero().getNombre() != fin) {
+        while (Integer.parseInt(grafo.getApuntador().getPuntero().getNombre()) != Integer.parseInt(fin)) {
             tmp = (LinkedList<Nodo>) visitar.clone();
             for (Nodo n : tmp) {
                 visitar.remove(n);
@@ -87,12 +123,21 @@ public class Init {
                 grafo.getApuntador().avanzarNodo(n);
                 grafo.mostrarPuntero();
                 Ventana.panel.run();
-                if (grafo.getApuntador().getPuntero().getNombre() == fin) {
+                if (Integer.parseInt(grafo.getApuntador().getPuntero().getNombre()) == Integer.parseInt(fin)) {
                     break;
                 } else if (!grafo.getApuntador().getPuntero().getArcos().isEmpty()) {
-                    for (Arco arco : grafo.getApuntador().getPuntero().getArcos()) {
-                        if (!visitados.contains(arco.getNodo()) && !visitar.contains(arco.getNodo())) {
-                            visitar.add(arco.getNodo());
+                    if (sentido) {
+                        for (Arco arco : grafo.getApuntador().getPuntero().getArcos()) {
+                            if (!visitados.contains(arco.getNodo()) && !visitar.contains(arco.getNodo())) {
+                                visitar.add(arco.getNodo());
+                            }
+                        }
+                    } else {
+                        for (int i = grafo.getApuntador().getPuntero().getArcos().size() - 1; i >= 0; i--) {
+                            Arco arco = grafo.getApuntador().getPuntero().getArcos().get(i);
+                            if (!visitados.contains(arco.getNodo()) && !visitar.contains(arco.getNodo())) {
+                                visitar.add(arco.getNodo());
+                            }
                         }
                     }
                 }
@@ -104,51 +149,77 @@ public class Init {
         System.out.println(" ------------- Busqueda por Escalada Simple ------------- ");
         grafo.goToRaiz();
         visitados = new LinkedList<>();
-        int index = matriz[(int) fin - 65][(int) grafo.getApuntador().getPuntero().getNombre() - 65];
+        int index = matriz[Integer.parseInt(fin)][Integer.parseInt(grafo.getApuntador().getPuntero().getNombre())];
         Ventana.panel.run();
-        while (grafo.getApuntador().getPuntero().getNombre() != fin) {
+        while (Integer.parseInt(grafo.getApuntador().getPuntero().getNombre()) != Integer.parseInt(fin)) {
             System.out.println("Costo Actual -> " + index);
-            for (Arco a : grafo.getApuntador().getPuntero().getArcos()) {
-                int tempIndex = matriz[(int) fin - 65][(int) a.getNodo().getNombre() - 65];
-                if (tempIndex < index) {
-                    index = tempIndex;
-                    visitados.add(grafo.getApuntador().getPuntero());
-                    grafo.getApuntador().avanzarNodo(a.getNodo());
-                    grafo.mostrarPuntero();
-                    Ventana.panel.run();
+            if (sentido) {
+                for (Arco a : grafo.getApuntador().getPuntero().getArcos()) {
+                    int tempIndex = matriz[Integer.parseInt(fin)][Integer.parseInt(a.getNodo().getNombre())];
+                    if (tempIndex < index) {
+                        index = tempIndex;
+                        visitados.add(grafo.getApuntador().getPuntero());
+                        grafo.getApuntador().avanzarNodo(a.getNodo());
+                        grafo.mostrarPuntero();
+                        Ventana.panel.run();
+                        break;
+                    }
+                }
+            } else {
+                for (int i = grafo.getApuntador().getPuntero().getArcos().size() - 1; i >= 0; i--) {
+                    Arco a = grafo.getApuntador().getPuntero().getArcos().get(i);
+                    int tempIndex = matriz[Integer.parseInt(fin)][Integer.parseInt(a.getNodo().getNombre())];
+                    if (tempIndex < index) {
+                        index = tempIndex;
+                        visitados.add(grafo.getApuntador().getPuntero());
+                        grafo.getApuntador().avanzarNodo(a.getNodo());
+                        grafo.mostrarPuntero();
+                        Ventana.panel.run();
+                        break;
+                    }
+                }
+                if (index == 0 && Integer.parseInt(grafo.getApuntador().getPuntero().getNombre()) != Integer.parseInt(fin)) {
+                    System.out.println("Fin de la ruta tabla rota");
                     break;
                 }
             }
-            if (index == 0 && grafo.getApuntador().getPuntero().getNombre() != fin) {
-                System.out.println("Fin de la ruta tabla rota");
-                break;
-            }
+            visitados.add(grafo.getApuntador().getPuntero());
+            Ventana.panel.run();
         }
-        visitados.add(grafo.getApuntador().getPuntero());
-        Ventana.panel.run();
     }
 
     private static void BuesquedaMaximaPendiente() {
         System.out.println(" ------------- Busqueda por Maxima Pendiente ------------- ");
         grafo.goToRaiz();
         visitados = new LinkedList<>();
-        int index = matriz[(int) fin - 65][(int) grafo.getApuntador().getPuntero().getNombre() - 65];
+        int index = matriz[Integer.parseInt(fin)][Integer.parseInt(grafo.getApuntador().getPuntero().getNombre())];
         Nodo tempNodo = null;
         Ventana.panel.run();
-        while (grafo.getApuntador().getPuntero().getNombre() != fin) {
+        while (Integer.parseInt(grafo.getApuntador().getPuntero().getNombre()) != Integer.parseInt(fin)) {
             System.out.println("Costo Actual -> " + index);
-            for (Arco a : grafo.getApuntador().getPuntero().getArcos()) {
-                int tempIndex = matriz[(int) fin - 65][(int) a.getNodo().getNombre() - 65];
-                if (tempIndex < index) {
-                    index = tempIndex;
-                    tempNodo = a.getNodo();
+            if (sentido) {
+                for (Arco a : grafo.getApuntador().getPuntero().getArcos()) {
+                    int tempIndex = matriz[Integer.parseInt(fin)][Integer.parseInt(a.getNodo().getNombre())];
+                    if (tempIndex < index) {
+                        index = tempIndex;
+                        tempNodo = a.getNodo();
+                    }
+                }
+            } else {
+                for (int i = grafo.getApuntador().getPuntero().getArcos().size() - 1; i >= 0; i--) {
+                    Arco a = grafo.getApuntador().getPuntero().getArcos().get(i);
+                    int tempIndex = matriz[Integer.parseInt(fin)][Integer.parseInt(a.getNodo().getNombre())];
+                    if (tempIndex < index) {
+                        index = tempIndex;
+                        tempNodo = a.getNodo();
+                    }
                 }
             }
             visitados.add(grafo.getApuntador().getPuntero());
             grafo.getApuntador().avanzarNodo(tempNodo);
             grafo.mostrarPuntero();
             Ventana.panel.run();
-            if (index == 0 && grafo.getApuntador().getPuntero().getNombre() != fin) {
+            if (index == 0 && Integer.parseInt(grafo.getApuntador().getPuntero().getNombre()) != Integer.parseInt(fin)) {
                 System.out.println("Fin de la ruta tabla rota");
                 break;
             }
@@ -164,7 +235,7 @@ public class Init {
         Nodo tempNodo = null;
         int f, g = 0, h;
         Ventana.panel.run();
-        while (grafo.getApuntador().getPuntero().getNombre() != fin) {
+        while (Integer.parseInt(grafo.getApuntador().getPuntero().getNombre()) != Integer.parseInt(fin)) {
             f = Integer.MAX_VALUE;
             tempNodo = grafo.getApuntador().getAntecesor();
             if (tempNodo != null) {
@@ -175,12 +246,24 @@ public class Init {
                     }
                 }
             }
-            for (Arco a : grafo.getApuntador().getPuntero().getArcos()) {
-                h = matriz[(int) fin - 65][(int) a.getNodo().getNombre() - 65];
-                int tempF = g + h;
-                if (tempF < f) {
-                    f = tempF;
-                    tempNodo = a.getNodo();
+            if (sentido) {
+                for (Arco a : grafo.getApuntador().getPuntero().getArcos()) {
+                    h = matriz[Integer.parseInt(fin)][Integer.parseInt(a.getNodo().getNombre())];
+                    int tempF = g + h;
+                    if (tempF < f) {
+                        f = tempF;
+                        tempNodo = a.getNodo();
+                    }
+                }
+            } else {
+                for (int i = grafo.getApuntador().getPuntero().getArcos().size() - 1; i >= 0; i--) {
+                    Arco a = grafo.getApuntador().getPuntero().getArcos().get(i);
+                    h = matriz[Integer.parseInt(fin)][Integer.parseInt(a.getNodo().getNombre())];
+                    int tempF = g + h;
+                    if (tempF < f) {
+                        f = tempF;
+                        tempNodo = a.getNodo();
+                    }
                 }
             }
             if (grafo.getApuntador().getAntecesor() != null && grafo.getApuntador().getAntecesor().equals(tempNodo)) {

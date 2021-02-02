@@ -4,11 +4,11 @@ import java.awt.*;
 import java.util.LinkedList;
 
 public class Nodo {
-    private char nombre;
+    private String nombre;
     private LinkedList<Arco> arcos;
     private Point posicion;
 
-    public Nodo(char nombre, int x, int y) {
+    public Nodo(String nombre, int x, int y) {
         this.nombre = nombre;
         this.arcos = new LinkedList<>();
         this.posicion = new Point(x, y);
@@ -18,7 +18,7 @@ public class Nodo {
         return this.arcos;
     }
 
-    public char getNombre() {
+    public String getNombre() {
         return nombre;
     }
 

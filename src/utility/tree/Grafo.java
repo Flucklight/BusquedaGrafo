@@ -16,7 +16,7 @@ public class Grafo {
     private BufferedReader cargar;
 
     public Grafo() throws IOException {
-        this.inicial = new Nodo('A', 512, 360);
+        this.inicial = new Nodo("0", 512, 360);
         this.nodos = new LinkedList<>();
         this.nodos.add(this.inicial);
         this.apuntador = new Apuntador(this.inicial);
@@ -47,7 +47,7 @@ public class Grafo {
         for (int i = 1; i < this.matriz.length; i++) {
             int x = new Random().nextInt(950);
             int y = new Random().nextInt(680);
-            this.nodos.add(new Nodo((char) (i + 65), x, y));
+            this.nodos.add(new Nodo(String.valueOf(i), x, y));
         }
 
         for (int i = 0; i < this.matriz.length; i++) {
@@ -55,7 +55,7 @@ public class Grafo {
             for (int j = 0; j < this.matriz[i].length; j++) {
                 if (this.matriz[i][j] != 0) {
                     for (Nodo nodo : this.nodos) {
-                        if ((char) (j + 65) == nodo.getNombre()) {
+                        if (j == Integer.parseInt(nodo.getNombre())) {
                             auxNodo = nodo;
                             auxArco = new Arco(auxNodo, this.matriz[i][j]);
                             this.apuntador.getPuntero().getArcos().add(auxArco);
@@ -85,7 +85,7 @@ public class Grafo {
         return inicial;
     }
 
-    public void setInicial(char inicial) {
+    public void setInicial(String inicial) {
         for (Nodo n : this.nodos) {
             if (n.getNombre() == inicial) {
                 this.inicial = n;
